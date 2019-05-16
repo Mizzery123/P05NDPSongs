@@ -7,21 +7,24 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
 public class SecondActivity extends AppCompatActivity {
 
-    ArrayList<Song> al;
+    ArrayList<Song> al, alFive;
     ListView lv;
-    ArrayAdapter aa;
+    ArrayAdapter aa, aaf;
     ArrayList<Song> data;
-
+Button btnFive;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
+
+        btnFive = findViewById(R.id.btnFive);
 
         DBHelper db = new DBHelper(this);
         db.getWritableDatabase();
@@ -35,15 +38,18 @@ public class SecondActivity extends AppCompatActivity {
 
         final ArrayList<Song> data =  db.getAllSongs();
 
-
+final ArrayList<Song> five = db.getAllSongs(5);
 
 
         db.close();
 
         aa = new CustomAdapter(this, R.layout.row, data);
+
+        aaf = new CustomAdapter(this,R.layout.row, five);
+
         lv.setAdapter(aa);
 
-
+aa.notifyDataSetChanged();
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -58,17 +64,31 @@ public class SecondActivity extends AppCompatActivity {
                 Song datas = data.get(position);
 
 
-                String id = (datas).toString().split(",")[0].split(":")[1];
-                Log.d("IDD",id);
-                String title = (datas).toString().split(",")[1].trim();
-                String singer = (datas).toString().split(",")[2].trim();
-                String year = (datas).toString().split(",")[3].split(":")[4];
-                String star = (datas).toString().split(",")[4].split(":")[4];
+
+
+                String id = datas.toString().split(",")[0].split(":")[1];
+
+                String title = datas.toString().split(",")[1].trim();
+                String singer = datas.toString().split(",")[2].trim();
+                String year = datas.toString().split(",")[3].trim();
+                String star = datas.toString().split(",")[4].trim();
+
 
                 Song target = new Song(Integer.parseInt(id), title, singer, Integer.parseInt(year), Integer.parseInt(star));
                 i.putExtra("data", target);
 
-                startActivity(i);
+
+                startActivityForResult(i, 9);
+            }
+        });
+
+        btnFive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                lv.setAdapter(aaf);
+
+
             }
         });
 

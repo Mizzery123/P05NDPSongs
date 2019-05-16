@@ -8,7 +8,7 @@
     tools:context=".SecondActivity">
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/btnFive"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Show all songs with 5 stars" />

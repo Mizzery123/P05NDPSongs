@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 public class ThirdActivity extends AppCompatActivity {
@@ -15,6 +16,7 @@ public class ThirdActivity extends AppCompatActivity {
     EditText etTitle, etSinger, etYear;
     Button btnUpdate, btnDelete;
     Song data;
+    RadioGroup rg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,16 +32,18 @@ public class ThirdActivity extends AppCompatActivity {
         btnDelete = findViewById(R.id.btnDelete);
 
 
+
         Intent i = getIntent();
         data = (Song) i.getSerializableExtra("data");
 
         tvID.setText("ID: " + data.getId());
         etTitle.setText(data.getTitle());
         etSinger.setText(data.getSingers());
-        etYear.setText(data.getYear());
+        etYear.setText(String.valueOf(data.getYear()));
         int radio = data.getStars();
-        final RadioButton radioButton = (RadioButton) findViewById(radio);
-        radioButton.setChecked(true);
+        rg = (RadioGroup) findViewById(R.id.rg);
+        rg.clearCheck();
+        ((RadioButton)rg.getChildAt(radio-1)).setChecked(true);
 
 
 
@@ -53,19 +57,35 @@ public class ThirdActivity extends AppCompatActivity {
                 data.setTitle(etTitle.getText().toString());
                 data.setSingers(etSinger.getText().toString());
                 data.setYear(Integer.parseInt(etYear.getText().toString()));
-                data.setStars(Integer.parseInt(radioButton.getText().toString()));
+                data.setStars(rg.getCheckedRadioButtonId());
                 dbh.updateSong(data);
                 dbh.close();
 
                 Intent i = new Intent();
-                i.putExtra("data", etTitle.getText().toString());
+                i.putExtra("title", etTitle.getText().toString());
+                i.putExtra("singer", etSinger.getText().toString());
+                i.putExtra("year", etYear.getText().toString());
+                i.putExtra("star", rg.getCheckedRadioButtonId());
                 setResult(RESULT_OK, i);
 
                 finish();
             }
         });
 
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DBHelper dbh = new DBHelper(ThirdActivity.this);
+                dbh.deleteSong(data.getId());
+                dbh.close();
 
+                Intent i = new Intent();
+                i.putExtra("data", data.getId());
+                setResult(RESULT_OK, i);
+
+                finish();
+            }
+        });
 
 
     }

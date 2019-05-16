@@ -89,6 +89,35 @@ public class DBHelper extends SQLiteOpenHelper {
         return songs;
     }
 
+    public ArrayList<Song> getAllSongs(int keyword) {
+        ArrayList<Song> songs = new ArrayList<Song>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns= {COLUMN_ID, COLUMN_TITLE, COLUMN_SINGERS, COLUMN_YEAR, COLUMN_STARS};
+        String condition = COLUMN_STARS + " Like ?";
+        String[] args = { "==" + keyword};
+        Cursor cursor = db.query(TABLE_SONG, columns, condition, args,
+                null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(0);
+                String title = cursor.getString(1);
+                String singer = cursor.getString(2);
+                int year = cursor.getInt(3);
+
+
+
+                int stars = cursor.getInt(4);
+                Song obj = new Song(id, title, singer, year, stars);
+                songs.add(obj);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return songs;
+    }
+
     public int updateSong(Song data){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
